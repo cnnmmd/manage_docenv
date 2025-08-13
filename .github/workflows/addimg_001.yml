@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-        arc="${{ github.event.inputs.arc }}"
-        test -n "${arc}" && arc="-${arc}"
-        echo "arc=$arc" >> $GITHUB_ENV
+          arc="${{ github.event.inputs.arc }}"
+          test -n "${arc}" && arc="-${arc}"
+          echo "arc=$arc" >> $GITHUB_ENV
       - uses: actions/checkout@v4
         with:
           repository: ${{ inputs.rep }}
