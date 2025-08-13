@@ -23,7 +23,7 @@ jobs:
           opt="${{ inputs.opt }}"
           if test -n "${opt}"
           then
-            opt="-${opt}" >> $GITHUB_ENV
+            echo "opt=-${opt}" >> $GITHUB_ENV
             echo "dir=_option" >> $GITHUB_ENV
           fi
       - run: |
