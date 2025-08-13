@@ -21,11 +21,14 @@ jobs:
     steps:
       - run: |
           opt="${{ inputs.opt }}"
-          test -n "${opt}" && opt="-${opt}"
-          echo "opt=$opt" >> $GITHUB_ENV
-          echo "dir=_option" >> $GITHUB_ENV
+          if test -n "${opt}"
+          then
+            opt="-${opt}" >> $GITHUB_ENV
+            echo "dir=_option" >> $GITHUB_ENV
+          fi
       - run: |
           echo "opt[${{ env.opt }}]"
+          echo "dir[${{ env.dir }}]"
       - uses: actions/checkout@v4
         with:
           repository: ${{ inputs.rep }}
