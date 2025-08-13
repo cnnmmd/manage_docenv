@@ -4,6 +4,8 @@ on:
     inputs:
       rep:
         type: string
+      nam:
+        type: string
       env:
         type: string
       ver:
