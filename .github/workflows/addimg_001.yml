@@ -10,7 +10,7 @@ on:
         type: string
       ver:
         type: string
-      arc:
+      opt:
         type: string
 permissions:
   contents: read
@@ -20,11 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          arc="${{ inputs.arc }}"
-          test -n "${arc}" && arc="-${arc}"
-          echo "arc=$arc" >> $GITHUB_ENV
+          opt="${{ inputs.opt }}"
+          test -n "${opt}" && opt="-${opt}"
+          echo "opt=$opt" >> $GITHUB_ENV
+          echo "dir=_option" >> $GITHUB_ENV
       - run: |
-          echo "arc[${{ env.arc }}]"
+          echo "opt[${{ env.opt }}]"
       - uses: actions/checkout@v4
         with:
           repository: ${{ inputs.rep }}
@@ -37,8 +38,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v6
         with:
-          file: ./export${{ env.arc }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}.txt
-          context: ./export${{ env.arc }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}
+          file: ./export${{ env.opt }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}.txt
+          context: ./export${{ env.dir }}${{ env.opt }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}
           push: true
           platforms: linux/amd64, linux/arm64
-          tags: ghcr.io/cnnmmd/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}${{ env.arc }}
+          tags: ghcr.io/cnnmmd/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}${{ env.opt }}
