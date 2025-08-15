@@ -1,0 +1,53 @@
+name: "addimg_001"
+on:
+  workflow_call:
+    inputs:
+      rep:
+        type: string
+      nam:
+        type: string
+      env:
+        type: string
+      ver:
+        type: string
+      opt:
+        type: string
+permissions:
+  contents: read
+  packages: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          opt="${{ inputs.opt }}"
+          if test -n "${opt}"
+          then
+            echo "opt=-${opt}" >> $GITHUB_ENV
+            echo "dir=_option" >> $GITHUB_ENV
+          fi
+      - run: |
+          echo "opt[${{ env.opt }}]"
+          echo "dir[${{ env.dir }}]"
+      - run: |
+          txtcns='cnsver.txt'
+          pthdoc="./export${{ env.dir }}${{ env.opt }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}"
+          cd ${pthdoc}
+          test -e ${txtcns} || curl https://raw.githubusercontent.com/litagin02/Style-Bert-VITS2/master/requirements.txt > ${txtcns}
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.rep }}
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          file: ./export${{ env.dir }}${{ env.opt }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}.txt
+          context: ./export${{ env.dir }}${{ env.opt }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}
+          push: true
+          platforms: linux/amd64, linux/arm64
+          tags: ghcr.io/cnnmmd/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}${{ env.opt }}
