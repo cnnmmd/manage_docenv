@@ -1,0 +1,55 @@
+name: "addimg_003"
+
+on:
+  workflow_dispatch:
+    inputs:
+      rep:
+        type: string
+      nam:
+        type: string
+      env:
+        type: string
+      ver:
+        type: string
+      opt:
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  addamd:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/addarc_001.yml
+        with:
+          rep: ${{ inputs.rep }}
+          nam: ${{ inputs.nam }}
+          env: ${{ inputs.env }}
+          ver: ${{ inputs.ver }}
+          opt: ${{ inputs.opt }}
+          arc: amd64
+
+  addarm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/addarc_001.yml
+        with:
+          rep: ${{ inputs.rep }}
+          nam: ${{ inputs.nam }}
+          env: ${{ inputs.env }}
+          ver: ${{ inputs.ver }}
+          opt: ${{ inputs.opt }}
+          arc: arm64
+
+  mrgarc:
+    needs: [addamd, addarm]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          tag="ghcr.io/${{ inputs.rep }}/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}"
+          docker buildx imagetools create \
+            ${tag}-${{ 'amd64' }} \
+            ${tag}-${{ 'arm64' }} \
+            --tag ${tag}
