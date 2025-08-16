@@ -22,7 +22,7 @@ jobs:
   addamd:
     runs-on: ubuntu-latest
     steps:
-      - uses: cnnmmd/manage_docenv/.github/actions/addarc_001@master
+      - uses: cnnmmd/manage_docenv/.github/actions/addarc_001/action.yml@master
         with:
           rep: ${{ inputs.rep }}
           nam: ${{ inputs.nam }}
@@ -34,7 +34,7 @@ jobs:
   addarm:
     runs-on: ubuntu-latest
     steps:
-      - uses: cnnmmd/manage_docenv/.github/actions/addarc_001@master
+      - uses: cnnmmd/manage_docenv/.github/actions/addarc_001/action.yml@master
         with:
           rep: ${{ inputs.rep }}
           nam: ${{ inputs.nam }}
