@@ -24,6 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          repository: cnnmmd/manage_docenv
+          ref: master
           path: src
       - uses: ./src/.github/actions/addarc_001
         with:
@@ -39,6 +41,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          repository: cnnmmd/manage_docenv
+          ref: master
           path: src
       - uses: ./src/.github/actions/addarc_001
         with:
