@@ -11,15 +11,19 @@ permissions:
   packages: write
 jobs:
   addimg:
+    outputs:
+      opt: ${{ steps.setopt.outputs.opt }}
     strategy:
       matrix:
         arc: [amd64, arm64]
     runs-on: ubuntu-latest
     steps:
-      - run: |
+      - id: setopt
+        run: |
           opt="${{ inputs.opt }}"
           if test -n "${opt}"
           then
+            echo "opt=-${opt}" >> $GITHUB_OUTPUT
             echo "opt=-${opt}" >> $GITHUB_ENV
             echo "dir=_option" >> $GITHUB_ENV
           fi
@@ -50,7 +54,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - run: |
-          tagtgt="ghcr.io/cnnmmd/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}${{ env.opt }}"
+          tagtgt="ghcr.io/cnnmmd/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}${{ needs.addimg.outputs.opt }}"
           tagamd="${tagtgt}-amd64"
           tagarm="${tagtgt}-arm64"
           docker buildx imagetools create \
