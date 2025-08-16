@@ -1,7 +1,7 @@
 name: "addimg_003"
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       rep:
         type: string
