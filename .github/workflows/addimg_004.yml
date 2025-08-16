@@ -22,7 +22,7 @@ jobs:
   addamd:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/addarc_002.yml
+      - uses: ./.github/actions/addarc_002
         with:
           rep: ${{ inputs.rep }}
           nam: ${{ inputs.nam }}
@@ -34,7 +34,7 @@ jobs:
   addarm:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/addarc_002.yml
+      - uses: ./.github/actions/addarc_002
         with:
           rep: ${{ inputs.rep }}
           nam: ${{ inputs.nam }}
