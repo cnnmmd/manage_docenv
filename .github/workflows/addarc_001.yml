@@ -1,20 +1,26 @@
 name: "addarc_001"
 
-inputs:
-  rep:
-    type: string
-  nam:
-    type: string
-  env:
-    type: string
-  ver:
-    type: string
-  opt:
-    type: string
-  arc:
-    type: string # amd64 / arm64
+on:
+  workflow_call:
+    inputs:
+      rep:
+        type: string
+      nam:
+        type: string
+      env:
+        type: string
+      ver:
+        type: string
+      opt:
+        type: string
+      arc:
+        type: string # amd64 / arm64
 
-runs:
+permissions:
+  contents: read
+  packages: write
+
+  runs:
   using: "composite"
   steps:
     - run: |
