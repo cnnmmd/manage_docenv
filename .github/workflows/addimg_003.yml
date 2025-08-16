@@ -19,37 +19,28 @@ permissions:
   packages: write
 
 jobs:
-  addamd:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: cnnmmd/manage_docenv/.github/actions/addarc_001/action.yml@master
-        with:
-          rep: ${{ inputs.rep }}
-          nam: ${{ inputs.nam }}
-          env: ${{ inputs.env }}
-          ver: ${{ inputs.ver }}
-          opt: ${{ inputs.opt }}
-          arc: amd64
-
-  addarm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: cnnmmd/manage_docenv/.github/actions/addarc_001/action.yml@master
-        with:
-          rep: ${{ inputs.rep }}
-          nam: ${{ inputs.nam }}
-          env: ${{ inputs.env }}
-          ver: ${{ inputs.ver }}
-          opt: ${{ inputs.opt }}
-          arc: arm64
-
-  mrgarc:
-    needs: [addamd, addarm]
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          tag="ghcr.io/${{ inputs.rep }}/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}"
-          docker buildx imagetools create \
-            ${tag}-${{ 'amd64' }} \
-            ${tag}-${{ 'arm64' }} \
-            --tag ${tag}
+  runs-on: ubuntu-latest
+  steps:
+    call:
+    - uses: cnnmmd/manage_docenv/.github/workflows/addarc_001.yml@master
+      with:
+        rep: ${{ inputs.rep }}
+        nam: ${{ inputs.nam }}
+        env: ${{ inputs.env }}
+        ver: ${{ inputs.ver }}
+        opt: ${{ inputs.opt }}
+        arc: amd64
+    - uses: cnnmmd/manage_docenv/.github/workflows/addarc_001.yml@master
+      with:
+        rep: ${{ inputs.rep }}
+        nam: ${{ inputs.nam }}
+        env: ${{ inputs.env }}
+        ver: ${{ inputs.ver }}
+        opt: ${{ inputs.opt }}
+        arc: arm64
+    - run: |
+        tag="ghcr.io/${{ inputs.rep }}/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}"
+        docker buildx imagetools create \
+        ${tag}-${{ 'amd64' }} \
+        ${tag}-${{ 'arm64' }} \
+        --tag ${tag}
