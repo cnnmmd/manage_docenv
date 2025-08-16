@@ -1,0 +1,48 @@
+name: "addarc_001"
+
+inputs:
+  rep:
+    type: string
+  nam:
+    type: string
+  env:
+    type: string
+  ver:
+    type: string
+  opt:
+    type: string
+  arc:
+    type: string # amd64 / arm64
+
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        opt="${{ inputs.opt }}"
+        if test -n "${opt}"; then
+          echo "opt=-${opt}" >> $GITHUB_ENV
+          echo "dir=_option" >> $GITHUB_ENV
+        fi
+
+    - run: |
+        echo "opt[${{ env.opt }}]"
+        echo "dir[${{ env.dir }}]"
+
+    - uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.rep }}
+    - uses: docker/setup-qemu-action@v3
+    - uses: docker/setup-buildx-action@v3
+    - uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - uses: docker/build-push-action@v6
+      with:
+        file: ./export${{ env.dir }}${{ env.opt }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}.txt
+        context: ./export${{ env.dir }}${{ env.opt }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}
+        push: true
+        platforms: linux/${{ inputs.arc }}
+        tags: ghcr.io/${{ inputs.rep }}/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}-${{ inputs.arc }}
