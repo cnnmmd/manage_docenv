@@ -1,46 +1,59 @@
-name: "addimg_003"
-
 on:
   workflow_call:
     inputs:
-      rep:
-        type: string
-      nam:
-        type: string
-      env:
-        type: string
-      ver:
-        type: string
-      opt:
-        type: string
-
+      rep: { type: string }
+      nam: { type: string }
+      env: { type: string }
+      ver: { type: string }
+      opt: { type: string }
 permissions:
   contents: read
   packages: write
-
 jobs:
-  runs-on: ubuntu-latest
-  steps:
-    call:
-    - uses: cnnmmd/manage_docenv/.github/workflows/addarc_001.yml@master
-      with:
-        rep: ${{ inputs.rep }}
-        nam: ${{ inputs.nam }}
-        env: ${{ inputs.env }}
-        ver: ${{ inputs.ver }}
-        opt: ${{ inputs.opt }}
-        arc: amd64
-    - uses: cnnmmd/manage_docenv/.github/workflows/addarc_001.yml@master
-      with:
-        rep: ${{ inputs.rep }}
-        nam: ${{ inputs.nam }}
-        env: ${{ inputs.env }}
-        ver: ${{ inputs.ver }}
-        opt: ${{ inputs.opt }}
-        arc: arm64
-    - run: |
-        tag="ghcr.io/${{ inputs.rep }}/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}"
-        docker buildx imagetools create \
-        ${tag}-${{ 'amd64' }} \
-        ${tag}-${{ 'arm64' }} \
-        --tag ${tag}
+  addimg:
+    strategy:
+      matrix:
+        arc: [amd64, arm64]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          opt="${{ inputs.opt }}"
+          if test -n "${opt}"
+          then
+            echo "opt=-${opt}" >> $GITHUB_ENV
+            echo "dir=_option" >> $GITHUB_ENV
+          fi
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.rep }}
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          platforms: linux/${{ matrix.arc }}
+          file: ./export${{ env.dir }}${{ env.opt }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}.txt
+          context: ./export${{ env.dir }}${{ env.opt }}/cnf/${{ inputs.nam }}/docenv_${{ inputs.env }}
+          push: true
+          tags: ghcr.io/cnnmmd/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}${{ env.opt }}-${{ matrix.arc }}
+  mrgimg:
+    needs: addimg
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          tagtgt="ghcr.io/cnnmmd/${{ inputs.nam }}/${{ inputs.env }}:${{ inputs.ver }}${{ env.opt }}"
+          tagamd="${tagtgt}-amd64"
+          tagarm="${tagtgt}-arm64"
+          docker buildx imagetools create \
+          ${tagamd} \
+          ${tagarm} \
+          --tag ${tagtgt}
