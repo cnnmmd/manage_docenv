@@ -1,4 +1,4 @@
-name: "addimg_001"
+name: "addimg_002"
 on:
   workflow_call:
     inputs:
