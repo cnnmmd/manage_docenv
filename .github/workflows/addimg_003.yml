@@ -23,7 +23,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/addarc_001
+        with:
+          path: src
+      - uses: ./src/.github/actions/addarc_001
         with:
           rep: ${{ inputs.rep }}
           nam: ${{ inputs.nam }}
@@ -36,7 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/addarc_001
+        with:
+          path: src
+      - uses: ./src/.github/actions/addarc_001
         with:
           rep: ${{ inputs.rep }}
           nam: ${{ inputs.nam }}
